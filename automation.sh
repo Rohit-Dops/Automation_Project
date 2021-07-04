@@ -34,5 +34,30 @@ aws s3 \
 	s3://${s3_bucket}/${my_name}-httpd-logs-${timestamp}.tar
 
 
+#adding invertory page for apache2
 																	
 
+path="/var/www/html"
+
+if [[ ! -f $path/inventory.html ]]; 
+then
+	echo -e 'Log Type\t-\tTime Created\t-\tType\t-\tSize' >> $path/inventory.html
+fi
+
+if [[ -f $path/inventory.html ]]; 
+then
+			        
+	size=$(du -h /tmp/$my_name-httpd-logs-$timestamp.tar | awk '{print $1}')
+	echo -e "httpd-logs\t-\t$timestamp\t-\ttar\t-\t$size" >> $path/inventory.html
+fi
+
+
+# adding cronjob for script
+
+if [ -f "/etc/cron.d/automation" ];
+then
+	echo "Automation script already exist"
+else
+	touch /etc/cron.d/automation
+	printf "0 0 * * * root /root/Automation_Project/auotmation.sh" > /etc/cron.d/automation
+fi
